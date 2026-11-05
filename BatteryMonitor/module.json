@@ -1,0 +1,14 @@
+{
+    "id": "{E85495C1-DF5B-4F7C-BA43-943FAFE74D16}",
+    "name": "BatteryMonitor",
+    "type": 3,
+    "vendor": "",
+    "aliases": [
+        "Batterieüberwachung"
+    ],
+    "url": "",
+    "parentRequirements": [],
+    "childRequirements": [],
+    "implemented": [],
+    "prefix": "BATM"
+}

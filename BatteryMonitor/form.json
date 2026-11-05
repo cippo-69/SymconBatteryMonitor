@@ -1,0 +1,103 @@
+{
+    "elements": [
+        { "type": "CheckBox", "name": "Active", "caption": "Überwachung aktiv" },
+        {
+            "type": "ExpansionPanel", "caption": "Prüfung", "expanded": true,
+            "items": [
+                { "type": "NumberSpinner", "name": "Threshold", "caption": "Schwellwert", "suffix": "%", "minimum": 1, "maximum": 99 },
+                { "type": "NumberSpinner", "name": "DurationHours", "caption": "Melden, wenn länger unterschritten als", "suffix": "h", "minimum": 0 },
+                { "type": "NumberSpinner", "name": "Hysteresis", "caption": "Hysterese (wieder OK ab Schwellwert +)", "suffix": "%", "minimum": 0, "maximum": 50 },
+                { "type": "NumberSpinner", "name": "StaleDays", "caption": "Gerät ohne Meldung seit (0 = aus)", "suffix": "Tage", "minimum": 0 },
+                { "type": "NumberSpinner", "name": "CheckInterval", "caption": "Prüfintervall", "suffix": "min", "minimum": 1 }
+            ]
+        },
+        {
+            "type": "ExpansionPanel", "caption": "Erkennung",
+            "items": [
+                { "type": "Label", "caption": "Immer erkannt: Profile ~Battery.100, ~Battery, ~Battery.Reversed sowie String-Profile mit „Battery“ (z. B. Gardena)." },
+                { "type": "CheckBox", "name": "UseNameMatching", "caption": "Zusätzlich über den Variablennamen erkennen (Batterie, Battery, Akku, Batterie schwach, LOWBAT …)" },
+                { "type": "ValidationTextBox", "name": "ExcludePattern", "caption": "Ausschließen, wenn Pfad passt (RegEx)", "width": "600px" },
+                {
+                    "type": "List", "name": "Excluded", "caption": "Ausgeschlossene Objekte (Variable, Instanz oder Kategorie inkl. Unterobjekte)",
+                    "add": true, "delete": true, "rowCount": 5,
+                    "columns": [
+                        { "caption": "Objekt", "name": "ObjectID", "width": "auto", "add": 0, "edit": { "type": "SelectObject" } }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "ExpansionPanel", "caption": "Meldestruktur – welches Gerät wird wo angezeigt und gemeldet",
+            "items": [
+                { "type": "Label", "caption": "Meldegruppen: jede Gruppe erhält eine eigene Übersicht (HTMLBox + Alarm) und eigene Meldeziele. Ohne eigene Ziele werden die Standardziele genutzt." },
+                {
+                    "type": "List", "name": "Groups", "caption": "Meldegruppen", "add": true, "delete": true, "rowCount": 6,
+                    "columns": [
+                        { "caption": "Name", "name": "Name", "width": "160px", "add": "", "edit": { "type": "ValidationTextBox" } },
+                        { "caption": "Automatisch, wenn Pfad passt (RegEx)", "name": "Pattern", "width": "auto", "add": "", "edit": { "type": "ValidationTextBox" } },
+                        { "caption": "Anzeigen", "name": "Visualize", "width": "90px", "add": true, "edit": { "type": "CheckBox" } },
+                        { "caption": "Melden", "name": "Notify", "width": "80px", "add": true, "edit": { "type": "CheckBox" } },
+                        { "caption": "Visualisierung/WebFront", "name": "VisuID", "width": "200px", "add": 0, "edit": { "type": "SelectInstance" } },
+                        { "caption": "SMTP", "name": "SMTPID", "width": "160px", "add": 0, "edit": { "type": "SelectInstance" } },
+                        { "caption": "Skript", "name": "ScriptID", "width": "160px", "add": 0, "edit": { "type": "SelectScript" } }
+                    ]
+                },
+                { "type": "Label", "caption": "Zuordnung: Variable, Gerät oder Kategorie (gilt für alles darunter) → Gruppe(n), kommagetrennt. „-“ = nicht melden (nur in der Gesamtübersicht). Die nächstliegende Zuordnung gewinnt und hat Vorrang vor den RegEx-Regeln." },
+                {
+                    "type": "List", "name": "Assignments", "caption": "Zuordnung", "add": true, "delete": true, "rowCount": 8,
+                    "columns": [
+                        { "caption": "Objekt", "name": "ObjectID", "width": "auto", "add": 0, "edit": { "type": "SelectObject" } },
+                        { "caption": "Gruppe(n)", "name": "Groups", "width": "300px", "add": "", "edit": { "type": "ValidationTextBox" } }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "ExpansionPanel", "caption": "Benachrichtigung (Standardziele für nicht zugeordnete Geräte)",
+            "items": [
+                { "type": "SelectInstance", "name": "VisuID", "caption": "Visualisierung / WebFront (Push)" },
+                { "type": "SelectInstance", "name": "SMTPID", "caption": "SMTP-Instanz (E-Mail)" },
+                { "type": "SelectScript", "name": "ScriptID", "caption": "Eigenes Skript ($_IPS['TITLE'], ['TEXT'], ['DEVICES'])" },
+                { "type": "CheckBox", "name": "NotifyStale", "caption": "Melden, wenn sich ein Gerät nicht mehr meldet" },
+                { "type": "CheckBox", "name": "NotifyRecovery", "caption": "Melden, wenn eine Batterie wieder OK ist (z. B. nach Tausch)" },
+                { "type": "CheckBox", "name": "SummaryEnabled", "caption": "Tägliche Zusammenfassung (nur wenn Geräte gemeldet sind)" },
+                { "type": "SelectTime", "name": "SummaryTime", "caption": "Uhrzeit der Zusammenfassung" }
+            ]
+        },
+        {
+            "type": "ExpansionPanel", "caption": "Visualisierung",
+            "items": [
+                { "type": "CheckBox", "name": "HtmlOnlyProblems", "caption": "In der Übersicht nur auffällige Geräte anzeigen" }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "type": "RowLayout",
+            "items": [
+                { "type": "Button", "caption": "Jetzt prüfen", "onClick": "BATM_Check($id); echo 'Prüfung abgeschlossen – Formular neu öffnen, um die Liste zu aktualisieren.';" },
+                { "type": "Button", "caption": "Zusammenfassung senden", "onClick": "BATM_SendSummary($id);" },
+                { "type": "Button", "caption": "Testnachricht", "onClick": "BATM_SendTest($id);" },
+                { "type": "Button", "caption": "Zustand zurücksetzen", "onClick": "BATM_ResetState($id);", "confirm": "Alle Fälle werden neu bewertet und ggf. erneut gemeldet. Fortfahren?" }
+            ]
+        },
+        {
+            "type": "List", "name": "Devices", "caption": "Gefundene Geräte", "rowCount": 20, "sort": { "column": "Status", "direction": "ascending" },
+            "columns": [
+                { "caption": "Gerät", "name": "Device", "width": "220px" },
+                { "caption": "Ort", "name": "Location", "width": "auto" },
+                { "caption": "Batterie", "name": "Level", "width": "80px" },
+                { "caption": "Flag", "name": "Flag", "width": "90px" },
+                { "caption": "Letzte Meldung", "name": "Updated", "width": "130px" },
+                { "caption": "Status", "name": "Status", "width": "120px" },
+                { "caption": "Meldegruppe(n)", "name": "Groups", "width": "160px" },
+                { "caption": "Variablen", "name": "Vars", "width": "110px" }
+            ],
+            "values": []
+        }
+    ],
+    "status": [
+        { "code": 102, "icon": "active", "caption": "Überwachung aktiv" },
+        { "code": 104, "icon": "inactive", "caption": "Überwachung deaktiviert" }
+    ]
+}

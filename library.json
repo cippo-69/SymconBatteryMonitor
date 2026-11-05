@@ -1,0 +1,12 @@
+{
+    "id": "{E92C9D64-5E30-44FA-ABCA-1045880E09BB}",
+    "author": "Volker Hauswald",
+    "name": "BatteryMonitor",
+    "url": "",
+    "compatibility": {
+        "version": "6.0"
+    },
+    "version": "1.0",
+    "build": 1,
+    "date": 1793923200
+}
