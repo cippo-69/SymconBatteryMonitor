@@ -636,8 +636,9 @@ class BatteryMonitor extends IPSModule
             . '.batm .bar span{position:absolute;left:0;top:0;bottom:0;border-radius:7px}'
             . '.batm .pct{display:inline-block;width:44px;text-align:right;margin-left:6px;font-variant-numeric:tabular-nums}'
             . '.batm .st{padding:2px 8px;border-radius:9px;font-size:12px;white-space:nowrap}'
-            . '.st-critical{background:#d9363e;color:#fff}.st-low{background:#e8a317;color:#000}'
-            . '.st-stale{background:#7a5cc2;color:#fff}.st-ok{background:#2e9d4f;color:#fff}.st-unknown{background:#888;color:#fff}'
+            // Farbkonzept W5x: gefüllte Etiketten mit weißer Schrift, in hellem und dunklem Visu-Modus lesbar (Kontrast >= 4,9:1)
+            . '.st-critical{background:#C8321F;color:#fff}.st-low{background:#9A5200;color:#fff}'
+            . '.st-stale{background:#6B7175;color:#fff}.st-ok{background:#2F6B4F;color:#fff}.st-unknown{background:#6B7175;color:#fff}'
             . '.batm-sum{margin:0 0 8px 0;font-size:14px}'
             . '@media (max-width:600px){.batm .hide-s{display:none}}'
             . '</style>';
@@ -652,7 +653,7 @@ class BatteryMonitor extends IPSModule
             }
             if ($d['level'] !== null) {
                 $lvl = max(0, min(100, $d['level']));
-                $color = $lvl < $threshold ? '#d9363e' : ($lvl < 50 ? '#e8a317' : '#2e9d4f');
+                $color = $lvl < $threshold ? '#E0533F' : ($lvl < 50 ? '#E09A45' : '#4E9A72'); // Signalrot / Harz / Tanne, mittlere Helligkeit für beide Modi
                 $bat = '<span class="bar"><span style="width:' . $lvl . '%;background:' . $color . '"></span></span><span class="pct">' . $lvl . ' %</span>';
                 if ($d['flag']) {
                     $bat .= ' ⚠';
