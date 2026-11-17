@@ -84,3 +84,7 @@ BATM_ResetState(int $InstanceID);     // gemerkte Fälle zurücksetzen
 Ordner `BatteryMonitor` als Git-Repository bereitstellen und in der Modulverwaltung
 hinzufügen, oder nach `<IPS>/modules/BatteryMonitor` kopieren und
 `MC_ReloadModule` / Dienst neu starten. Danach Instanz „BatteryMonitor“ anlegen.
+
+## Farben
+
+Die HTML-Übersicht hat keine eigenen Farbeinstellungen. Statusetiketten und Balken holen ihre Farben aus dem Modul [Visu Design](https://github.com/cippo-69/IPSymconVisuDesign) (`W5D_GetColors`): Etiketten in den Farben des hellen Modus, Balken in den Farben des Dark Mode, damit beide auf hellem und dunklem Grund lesbar sind. Ohne Design-Instanz gilt das Farbkonzept W5x.

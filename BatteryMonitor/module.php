@@ -627,6 +627,8 @@ class BatteryMonitor extends IPSModule
         $onlyProblems = $this->ReadPropertyBoolean('HtmlOnlyProblems');
         $h = fn ($s) => htmlspecialchars((string) $s, ENT_QUOTES, 'UTF-8');
 
+        $c = $this->DesignColors();
+        $bar = $this->DesignColors(true); // Balken: Farben des Dark Mode, auf hellem und dunklem Grund gut sichtbar
         $css = '<style>'
             . '.batm{width:100%;border-collapse:collapse;font-size:14px;color:inherit}'
             . '.batm th{text-align:left;font-weight:600;padding:6px 8px;border-bottom:1px solid rgba(128,128,128,.4)}'
@@ -636,9 +638,9 @@ class BatteryMonitor extends IPSModule
             . '.batm .bar span{position:absolute;left:0;top:0;bottom:0;border-radius:7px}'
             . '.batm .pct{display:inline-block;width:44px;text-align:right;margin-left:6px;font-variant-numeric:tabular-nums}'
             . '.batm .st{padding:2px 8px;border-radius:9px;font-size:12px;white-space:nowrap}'
-            // Farbkonzept W5x: gefüllte Etiketten mit weißer Schrift, in hellem und dunklem Visu-Modus lesbar (Kontrast >= 4,9:1)
-            . '.st-critical{background:#C8321F;color:#fff}.st-low{background:#9A5200;color:#fff}'
-            . '.st-stale{background:#6B7175;color:#fff}.st-ok{background:#2F6B4F;color:#fff}.st-unknown{background:#6B7175;color:#fff}'
+            // Farben aus dem Modul „Visu Design“: gefüllte Etiketten in den Farben des hellen Modus, in beiden Visu-Modi lesbar
+            . '.st-critical{background:' . $c['alarm'] . ';color:' . $c['on'] . '}.st-low{background:' . $c['warn'] . ';color:' . $c['on'] . '}'
+            . '.st-stale,.st-unknown{background:' . $c['muted'] . ';color:' . $c['on'] . '}.st-ok{background:' . $c['accent'] . ';color:' . $c['on'] . '}'
             . '.batm-sum{margin:0 0 8px 0;font-size:14px}'
             . '@media (max-width:600px){.batm .hide-s{display:none}}'
             . '</style>';
@@ -653,7 +655,7 @@ class BatteryMonitor extends IPSModule
             }
             if ($d['level'] !== null) {
                 $lvl = max(0, min(100, $d['level']));
-                $color = $lvl < $threshold ? '#E0533F' : ($lvl < 50 ? '#E09A45' : '#4E9A72'); // Signalrot / Harz / Tanne, mittlere Helligkeit für beide Modi
+                $color = $lvl < $threshold ? $bar['alarm'] : ($lvl < 50 ? $bar['warn'] : $bar['accent']);
                 $bat = '<span class="bar"><span style="width:' . $lvl . '%;background:' . $color . '"></span></span><span class="pct">' . $lvl . ' %</span>';
                 if ($d['flag']) {
                     $bat .= ' ⚠';
@@ -668,6 +670,27 @@ class BatteryMonitor extends IPSModule
                 . '<td><span class="st st-' . $d['status'] . '">' . $h($this->StatusText($d['status'])) . '</span></td></tr>';
         }
         return $html . '</table>';
+    }
+
+    /** Farben aus dem Modul „Visu Design“ (W5D); ohne Instanz gilt das Farbkonzept W5x. */
+    private function DesignColors(bool $dark = false): array
+    {
+        $colors = [
+            'light' => ['accent' => '#2F6B4F', 'on' => '#FFFFFF', 'muted' => '#6B7175', 'warn' => '#9A5200', 'alarm' => '#C8321F'],
+            'dark'  => ['accent' => '#74B892', 'on' => '#1E2224', 'muted' => '#A9AEB1', 'warn' => '#EE9A45', 'alarm' => '#FF5A47']
+        ];
+        $guid = '{018EEC85-8FFC-4E1F-A966-702C4BBDC2E8}';
+        if (IPS_ModuleExists($guid) && function_exists('W5D_GetColors')) {
+            $ids = IPS_GetInstanceListByModuleID($guid);
+            if (count($ids) > 0) {
+                sort($ids);
+                $design = json_decode(W5D_GetColors($ids[0]), true);
+                if (is_array($design)) {
+                    $colors = array_replace_recursive($colors, $design);
+                }
+            }
+        }
+        return $colors[$dark ? 'dark' : 'light'];
     }
 
     private function FlagText(array $d): string
